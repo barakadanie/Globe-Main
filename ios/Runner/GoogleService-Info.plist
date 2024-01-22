@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>1086040264661-itclvf59qalbv3o5d9l9ovoeg46p7lpf.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyAllihVulXHu4g7PBstG1hH75YufDwyhLc</string>
+	<key>GCM_SENDER_ID</key>
+	<string>1086040264661</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.heark.globe</string>
+	<key>PROJECT_ID</key>
+	<string>e-health-5e009</string>
+	<key>STORAGE_BUCKET</key>
+	<string>e-health-5e009.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:1086040264661:ios:a74feb229001f57274b75c</string>
+</dict>
+</plist>
