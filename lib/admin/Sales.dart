@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firestore
 import 'package:globe/admin/Books.dart';
 import 'package:globe/admin/Reports.dart';
 import 'package:globe/admin/Clients.dart';
@@ -77,7 +78,6 @@ class AddSalesDialog extends StatefulWidget {
 }
 
 class _AddSalesDialogState extends State<AddSalesDialog> {
-  // Add your necessary variables and controllers here
   String selectedBookName = ''; // Example variable for selected book name
   String selectedCategory = ''; // Example variable for selected category
   String selectedUser = ''; // Example variable for selected user
@@ -85,6 +85,10 @@ class _AddSalesDialogState extends State<AddSalesDialog> {
   double bookPrice = 0.0; // Example variable for book price
   int numberOfBooksToSend = 0; // Example variable for number of books to send out
   DateTime selectedDate = DateTime.now(); // Example variable for selected date
+  String bookImageUrl = ''; // Example variable for book image URL
+
+  // Firestore instance
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -96,12 +100,24 @@ class _AddSalesDialogState extends State<AddSalesDialog> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Image holder (Assuming you have an image URL)
-            Image.network(
-              'https://example.com/book_image.jpg',
-              height: 100,
-              width: 100,
-              fit: BoxFit.cover,
+            // Image holder from Firestore field bookImageUrl
+            FutureBuilder<String>(
+              future: _fetchBookImageUrl(selectedBookName),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return CircularProgressIndicator();
+                } else if (snapshot.hasError) {
+                  return Text("Error loading image");
+                } else {
+                  bookImageUrl = snapshot.data!;
+                  return Image.network(
+                    bookImageUrl,
+                    height: 100,
+                    width: 100,
+                    fit: BoxFit.cover,
+                  );
+                }
+              },
             ),
             SizedBox(height: 16),
             // Spinner for users
@@ -189,7 +205,7 @@ class _AddSalesDialogState extends State<AddSalesDialog> {
                   context: context,
                   initialDate: DateTime.now(),
                   firstDate: DateTime(2022),
-                  lastDate: DateTime(2030),
+                  lastDate: DateTime(2130),
                 );
                 if (pickedDate != null && pickedDate != selectedDate) {
                   setState(() {
@@ -223,6 +239,17 @@ class _AddSalesDialogState extends State<AddSalesDialog> {
         ),
       ],
     );
+  }
+
+  Future<String> _fetchBookImageUrl(String bookName) async {
+    try {
+      // Replace 'books' with the actual name of your Firestore collection
+      DocumentSnapshot bookSnapshot = await _firestore.collection('books').doc(bookName).get();
+      return bookSnapshot['bookImageUrl'];
+    } catch (error) {
+      print('Error fetching book image URL: $error');
+      return ''; // Return an empty string or a default image URL in case of an error
+    }
   }
 
   bool _validateData() {
