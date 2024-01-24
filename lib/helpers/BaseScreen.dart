@@ -23,7 +23,6 @@ class BaseScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(pageTitle),
         backgroundColor: Colors.blue,
-
         // Use the appBarColor parameter
       ),
       body: body,
