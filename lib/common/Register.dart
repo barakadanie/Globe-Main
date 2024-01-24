@@ -1,9 +1,16 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:globe/common/login.dart';
 
 class Register extends StatelessWidget {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  // Declare text controllers
+  final TextEditingController fullNameController = TextEditingController();
+  final TextEditingController phoneNumberController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
 
   Widget _buildPageContent(BuildContext context) {
     return Container(
@@ -64,6 +71,7 @@ class Register extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 20.0),
                     child: TextField(
+                      controller: fullNameController,
                       style: const TextStyle(color: Colors.blue),
                       decoration: InputDecoration(
                         hintText: "Enter Your Full Name",
@@ -86,6 +94,7 @@ class Register extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 20.0),
                     child: TextField(
+                      controller: phoneNumberController,
                       style: const TextStyle(color: Colors.blue),
                       decoration: InputDecoration(
                         hintText: "Enter Your Phone Number",
@@ -108,6 +117,7 @@ class Register extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 20.0),
                     child: TextField(
+                      controller: emailController,
                       style: const TextStyle(color: Colors.blue),
                       decoration: InputDecoration(
                         hintText: "Enter Email Address",
@@ -130,6 +140,7 @@ class Register extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 20.0),
                     child: TextField(
+                      controller: passwordController,
                       style: const TextStyle(color: Colors.blue),
                       obscureText: true,
                       decoration: InputDecoration(
@@ -228,14 +239,25 @@ class Register extends StatelessWidget {
         },
       );
 
-      // Get user input values
-      String fullName = "Full Name"; // Replace with the actual user input
-      String phoneNumber = "Phone Number"; // Replace with the actual user input
-      String email = "user@example.com"; // Replace with the actual user input
-      String password = "password"; // Replace with the actual user input
+      // Access text controllers to get user input values
+      String fullName = fullNameController.text;
+      String phoneNumber = phoneNumberController.text;
+      String email = emailController.text;
+      String password = passwordController.text;
 
       // Create a new user with email and password
-      await _auth.createUserWithEmailAndPassword(email: email, password: password);
+      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(email: email, password: password);
+
+      // Get the UID of the newly created user
+      String uid = userCredential.user!.uid;
+
+      // Save user details to Firestore under the 'Users' collection
+      await FirebaseFirestore.instance.collection('Users').doc(uid).set({
+        'fullName': fullName,
+        'phoneNumber': phoneNumber,
+        'email': email,
+        'role': 'salesperson', // Additional field for role
+      });
 
       // Close the registering dialog
       Navigator.of(context).pop();
