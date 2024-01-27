@@ -35,6 +35,9 @@ dependencies:
   google_sign_in: ^5.4.0
   image_picker: ^0.8.4+4
   permission_handler: ^11.0.1
+  syncfusion_flutter_pdf: ^20.2.47
+  syncfusion_flutter_datepicker: ^20.4.54
+  path_provider: ^2.0.14
 
 dev_dependencies:
   flutter_test:

@@ -183,6 +183,8 @@ class _BooksState extends State<Books> {
     TextEditingController priceController =
     TextEditingController(text: bookData['bookPrice']);
 
+    int? quantityToSend;
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
