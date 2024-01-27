@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_custom_clippers/flutter_custom_clippers.dart';
 import 'package:globe/admin/Books.dart';
@@ -358,16 +359,22 @@ _buildDrawer(BuildContext context) {
           child: SingleChildScrollView(
             child: Column(
               children: <Widget>[
-                Container(
-                  alignment: Alignment.centerRight,
-                  child: IconButton(
-                    icon: Icon(
-                      Icons.power_settings_new,
-                      color: Colors.grey.shade800,
-                    ),
-                    onPressed: () {},
-                  ),
+            Container(
+            alignment: Alignment.centerRight,
+              child: IconButton(
+                icon: Icon(
+                  Icons.power_settings_new,
+                  color: Colors.grey.shade800,
                 ),
+                onPressed: () async {
+                  // Perform logout actions
+                  await _logout();
+
+                  // Redirect to login screen
+                  Navigator.of(context).pushReplacementNamed('/login');
+                },
+              ),
+            ),
                 Container(
                   height: 90,
                   alignment: Alignment.center,
@@ -415,6 +422,14 @@ _buildDrawer(BuildContext context) {
   );
 }
 
+Future<void> _logout() async {
+  try {
+    await FirebaseAuth.instance.signOut();
+    // Optionally, you can perform additional cleanup or tasks during logout
+  } catch (e) {
+    print('Error during logout: $e');
+  }
+}
 
 Divider _buildDivider() {
   return Divider(

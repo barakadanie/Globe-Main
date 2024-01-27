@@ -18,27 +18,27 @@ class _UserProfilePageState extends State<ProfileAdmin> {
   TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
-
+  TextEditingController roleController = TextEditingController();
   @override
   void initState() {
     super.initState();
     // Fetch user data when the page is initialized
     _fetchUserData();
   }
-
   Future<void> _fetchUserData() async {
     try {
       User? user = _auth.currentUser;
       if (user != null) {
         // User is logged in, fetch data from Firestore
-        DocumentSnapshot<Map<String, dynamic>> snapshot =
+        DocumentSnapshot<Map<String, dynamic>?> snapshot =
         await FirebaseFirestore.instance.collection('Users').doc(user.uid).get();
 
         // Update the UI with the fetched data
         setState(() {
-          nameController.text = snapshot['fullName'];
-          emailController.text = snapshot['email'];
-          phoneController.text = snapshot['phoneNumber'];
+          nameController.text = snapshot['fullName'] ?? '';
+          emailController.text = snapshot['email'] ?? '';
+          phoneController.text = snapshot['phoneNumber'] ?? '';
+          roleController.text = snapshot['role'] ?? '';
         });
       }
     } catch (e) {
@@ -49,6 +49,9 @@ class _UserProfilePageState extends State<ProfileAdmin> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text('Profile'),
+      ),
       body: Stack(
         fit: StackFit.expand,
         children: <Widget>[
@@ -88,7 +91,10 @@ class _UserProfilePageState extends State<ProfileAdmin> {
         children: <Widget>[
           Container(
             padding: EdgeInsets.symmetric(horizontal: hPadding),
-            height: MediaQuery.of(context).size.height * 0.35,
+            height: MediaQuery
+                .of(context)
+                .size
+                .height * 0.35,
             child: Column(
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -137,6 +143,7 @@ class _UserProfilePageState extends State<ProfileAdmin> {
                     print('Name: ${nameController.text}');
                     print('Email: ${emailController.text}');
                     print('Phone: ${phoneController.text}');
+                    print('Role: ${roleController.text}');
                   },
                   child: const Text(
                     'UPDATE PROFILE',
@@ -162,7 +169,10 @@ class _UserProfilePageState extends State<ProfileAdmin> {
             alignment: Alignment.center,
             child: SizedBox(
               width: _isOpen
-                  ? (MediaQuery.of(context).size.width - (2 * hPadding!)) / 1.6
+                  ? (MediaQuery
+                  .of(context)
+                  .size
+                  .width - (2 * hPadding!)) / 1.6
                   : double.infinity,
               child: TextButton(
                 style: TextButton.styleFrom(
@@ -190,26 +200,54 @@ class _UserProfilePageState extends State<ProfileAdmin> {
 
   Column _titleSection() {
     return Column(
-      children: const <Widget>[
-        Text(
-          'Aanika Johnson',
-          style: TextStyle(
-            fontFamily: 'NimbusSanL',
-            fontWeight: FontWeight.w700,
-            fontSize: 30,
-          ),
+      children: <Widget>[
+        StreamBuilder<DocumentSnapshot>(
+          stream: FirebaseFirestore.instance
+              .collection('users')
+              .doc(_auth.currentUser?.uid)
+              .snapshots(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return CircularProgressIndicator(); // Loading indicator while data is being fetched
+            }
+
+            if (snapshot.hasError) {
+              return Text('Error: ${snapshot.error}');
+            }
+
+            if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null) {
+              return Text('No user data available'); // Display a message when no user data is found
+            }
+
+            var userData = snapshot.data!.data() as Map<String, dynamic>;
+
+            return Column(
+              children: <Widget>[
+                Text(
+                  userData['fullName'] ?? '',
+                  style: TextStyle(
+                    fontFamily: 'NimbusSanL',
+                    fontWeight: FontWeight.w700,
+                    fontSize: 30,
+                  ),
+                ),
+                SizedBox(
+                  height: 8,
+                ),
+                Text(
+                  userData['role'] ?? '',
+                  style: TextStyle(
+                    fontFamily: 'NimbusSanL',
+                    fontStyle: FontStyle.italic,
+                    fontSize: 16,
+                  ),
+                ),
+              ],
+            );
+          },
         ),
-        SizedBox(
-          height: 8,
-        ),
-        Text(
-          'Freelancer',
-          style: TextStyle(
-            fontFamily: 'NimbusSanL',
-            fontStyle: FontStyle.italic,
-            fontSize: 16,
-          ),
-        ),
+
+
       ],
     );
   }
